@@ -1,0 +1,40 @@
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { TodoApp, TodoAppDocument } from './schema/todo-app.schema';
+import { CreateTodoAppDto } from './dto/create-todo-app.dto';
+import { TodoAppEntity } from './todo-app.entity';
+import { plainToInstance } from 'class-transformer';
+
+@Injectable()
+export class TodoAppService {
+  constructor(
+    @InjectModel(TodoApp.name)
+    private todoAppModel: Model<TodoAppDocument>,
+  ) {}
+
+  async create(ownerId: string, dto: CreateTodoAppDto): Promise<TodoAppEntity> {
+    const created = await this.todoAppModel.create({
+      ...dto,
+      owner: new Types.ObjectId(ownerId),
+    });
+
+    return new TodoAppEntity(created.toObject() as unknown as Partial<TodoAppEntity>);
+
+  }
+
+  async findAllForUser(userId: string): Promise<TodoAppEntity[]> {
+    const objectId = new Types.ObjectId(userId);
+  
+    const todoDocs = await this.todoAppModel.find({
+      $or: [
+        { owner: objectId },
+        { editors: objectId },
+        { viewers: objectId },
+      ],
+    });
+  
+    const plain = todoDocs.map((doc) => doc.toObject());
+    return plainToInstance(TodoAppEntity, plain);
+  }
+}

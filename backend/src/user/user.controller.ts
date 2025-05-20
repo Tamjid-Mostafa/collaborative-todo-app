@@ -5,6 +5,7 @@ import { UserEntity } from './user.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('user')
+@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -12,13 +13,12 @@ export class UserController {
   create(@Body() dto: CreateUserDto): Promise<UserEntity> {
     return this.userService.create(dto);
   }
-  @UseGuards(JwtAuthGuard)
+
   @Get()
   findAll(): Promise<UserEntity[]> {
     return this.userService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findById(@Param('id') id: string): Promise<UserEntity> {
     return this.userService.findById(id);
