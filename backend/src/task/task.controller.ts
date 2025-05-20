@@ -1,8 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { TaskEntity } from './task.entity';
 
 @Controller('todo-apps/:todoAppId/tasks')
 @UseGuards(JwtAuthGuard)
@@ -10,17 +21,21 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post()
-  create(@Param('todoAppId') appId: string, @Req() req: any, @Body() dto: CreateTaskDto) {
+  create(
+    @Param('todoAppId') appId: string,
+    @Req() req: any,
+    @Body() dto: CreateTaskDto,
+  ): Promise<TaskEntity> {
     return this.taskService.create(appId, req.user.userId, dto);
   }
 
   @Get()
-  findAll(@Param('todoAppId') appId: string) {
+  findAll(@Param('todoAppId') appId: string): Promise<TaskEntity[]> {
     return this.taskService.findAll(appId);
   }
 
   @Patch(':taskId')
-  update(@Param('taskId') id: string, @Body() dto: UpdateTaskDto) {
+  update(@Param('taskId') id: string, @Body() dto: UpdateTaskDto): Promise<TaskEntity>  {
     return this.taskService.update(id, dto);
   }
 
