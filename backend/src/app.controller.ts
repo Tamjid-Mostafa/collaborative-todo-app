@@ -10,10 +10,4 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get(':id')
-  getUser(@Param('id', ParseIntPipe) id: number) {
-    // Now `id` is guaranteed to be a number
-    return `User ID is ${id}`;
-  }
-  
 }

@@ -1,12 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './interfaces/user/user.interface';
 import { CreateUserDto } from './dto/create-user.dto/create-user.dto';
-
+import { UserEntity } from './user.entity';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
-  private idCounter = 1;
+  private users: User[] = [
+    {
+      id: 1,
+      name: 'Tamjid Hossain',
+      email: 'tamjid@example.com',
+      password: '12345',
+    },
+    {
+      id: 2,
+      name: 'Mostafa Hossain',
+      email: 'mostafa@example.com',
+      password: '12345',
+    },
+    {
+      id: 3,
+      name: 'John Doe',
+      email: 'john@example.com',
+      password: '12345',
+    },
+  ];
+  private idCounter = 2;
 
   create(userDto: CreateUserDto): User {
     const newUser: User = {
@@ -17,7 +37,15 @@ export class UserService {
     return newUser;
   }
 
-  findAll(): User[] {
-    return this.users;
+  getUserById(id: number): UserEntity {
+    const user = this.users.find((user) => user.id === id);
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    return new UserEntity(user);
+  }
+
+  findAll(): UserEntity[] {
+    return plainToInstance(UserEntity, this.users);
   }
 }
