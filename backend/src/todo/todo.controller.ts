@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { TodoAppService } from './todo-app.service';
-import { CreateTodoAppDto } from './dto/create-todo-app.dto';
-import { TodoAppEntity } from './todo-app.entity';
+import { TodoAppService } from './todo.service';
 
-@Controller('todo-apps')
+import { TodoAppEntity } from './todo.entity';
+import { CreateTodoAppDto } from './dto/create-todo-app.dto';
+
+@Controller('todos')
 @UseGuards(JwtAuthGuard)
 
 export class TodoAppController {

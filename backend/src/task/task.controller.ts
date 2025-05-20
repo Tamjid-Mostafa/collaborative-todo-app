@@ -10,12 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskEntity } from './task.entity';
 
-@Controller('todo-apps/:todoAppId/tasks')
+@Controller('todos/:todoAppId/tasks')
 @UseGuards(JwtAuthGuard)
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}

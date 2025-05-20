@@ -1,31 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { TodoAppService } from './todo.service';
 import { getModelToken } from '@nestjs/mongoose';
-import { TaskService } from './task.service';
-import { Task } from './schema/task.schema';
+import { TodoApp } from './schema/todo.schema';
 
-describe('TaskService', () => {
-  let service: TaskService;
+describe('TodoAppService', () => {
+  let service: TodoAppService;
 
-  const mockTaskModel = {
+  const mockModel = {
     create: jest.fn(),
     find: jest.fn().mockReturnThis(),
-    findById: jest.fn().mockReturnThis(),
-    findByIdAndDelete: jest.fn(),
     exec: jest.fn().mockResolvedValue([]),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        TaskService,
+        TodoAppService,
         {
-          provide: getModelToken(Task.name),
-          useValue: mockTaskModel,
+          provide: getModelToken(TodoApp.name),
+          useValue: mockModel,
         },
       ],
     }).compile();
 
-    service = module.get<TaskService>(TaskService);
+    service = module.get<TodoAppService>(TodoAppService);
   });
 
   it('should be defined', () => {

@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { TodoApp, TodoAppDocument } from './schema/todo-app.schema';
-import { CreateTodoAppDto } from './dto/create-todo-app.dto';
-import { TodoAppEntity } from './todo-app.entity';
+import { TodoApp, TodoAppDocument } from './schema/todo.schema';
+
+import { TodoAppEntity } from './todo.entity';
 import { plainToInstance } from 'class-transformer';
+import { CreateTodoAppDto } from './dto/create-todo-app.dto';
 
 @Injectable()
 export class TodoAppService {
