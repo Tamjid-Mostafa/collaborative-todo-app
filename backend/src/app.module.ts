@@ -3,15 +3,21 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UserModule, MongooseModule.forRoot('mongodb+srv://work-tasks:h0Dg8ziyZGLALXT8@cluster0.j8jry5z.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
-    dbName: 'work-tasks',
-    // Additional options here, e.g.,
-    // useNewUrlParser: true,
-    // useUnifiedTopology: true,
-  }),
-],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      expandVariables: true
+    }),
+    UserModule,
+    MongooseModule.forRoot(process.env.MONGODB_URI!, {
+      dbName: 'work-tasks',
+    }),
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

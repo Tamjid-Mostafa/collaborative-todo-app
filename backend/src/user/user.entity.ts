@@ -4,8 +4,12 @@ export class UserEntity {
   @Expose({ name: 'id' })
   @Transform(({ value }) => value.toString())
   _id: string;
-  name: string;
+
+  firstName: string;
+  lastName: string;
   email: string;
+  username: string;
+  role: string;
 
   @Exclude()
   password: string;
