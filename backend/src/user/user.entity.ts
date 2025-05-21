@@ -1,7 +1,7 @@
 import { Exclude, Expose, Transform } from 'class-transformer';
 
 export class UserEntity {
-  @Expose({ name: 'id' })
+  @Expose()
   @Transform(({ value }) => value.toString())
   _id: string;
 

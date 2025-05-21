@@ -18,8 +18,8 @@ export class UserService {
 
   async findAll(): Promise<UserEntity[]> {
     const users = await this.userModel.find();
-    const plainUsers = users.map((user) => new UserEntity(user.toObject() as Partial<UserEntity>));
-    return plainUsers;
+    const plainUsers = users.map((user) => user.toObject());
+    return plainToInstance(UserEntity, plainUsers);
   }
 
   async findById(id: string): Promise<UserEntity> {
@@ -27,14 +27,14 @@ export class UserService {
     if (!user) throw new NotFoundException(`User not found`);
     return new UserEntity(user.toObject() as Partial<UserEntity>);
   }
-  
+
   async findByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email }).exec();
   }
   async findByUsername(username: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ username }).exec();
   }
-  
+
   async delete(id: string): Promise<void> {
     const result = await this.userModel.deleteOne({ _id: id });
     if (result.deletedCount === 0) {

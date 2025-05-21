@@ -2,7 +2,6 @@ import { Exclude, Expose, Transform } from 'class-transformer';
 import { Types } from 'mongoose';
 
 export class TaskEntity {
-  @Expose({ name: 'id' })
   @Transform(({ value }) => value.toString())
   _id: string;
 
