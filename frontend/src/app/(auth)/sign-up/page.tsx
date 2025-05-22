@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,6 +17,8 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { api } from "@/lib/axios";
+import { useState } from "react";
+import { Eye, EyeOff, Loader, Loader2 } from "lucide-react";
 
 const FormSchema = z
   .object({
@@ -49,57 +52,91 @@ export default function SignUpForm() {
       passwordConfirm: "",
     },
   });
+  const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    setLoading(true);
     try {
-      const res = await api.post("/auth/signup", data);
-      console.log({ res, "RESPONSE DATA": res.data });
+      const { passwordConfirm, ...userCredentials } = data;
+      const res = await api.post("/auth/signup", userCredentials);
       toast.success("Account created");
+      setLoading(false);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Signup failed");
+      toast.error(err.response?.data?.message || "Signup failed", {
+        action: {
+          label: "reset",
+          onClick: () => setLoading(false),
+        },
+        onDismiss: () => setLoading(false),
+      });
     }
   }
 
   return (
-    <Card className="max-w-md w-full mx-auto">
+    <Card className="max-w-md w-full mx-auto mt-24 shadow-xl border border-muted">
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
+        <CardTitle className="text-center text-2xl">
+          Create an Account
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {["firstName", "lastName", "username", "email", "password"].map(
-              (field) => (
-                <FormField
-                  key={field}
-                  control={form.control}
-                  name={field as keyof z.infer<typeof FormSchema>}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{field.name}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type={field.name === "password" ? "password" : "text"}
-                          placeholder={field.name}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )
-            )}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="passwordConfirm"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="johndoe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      type="password"
-                      placeholder="Confirm your password"
+                      type="email"
+                      placeholder="you@example.com"
                       {...field}
                     />
                   </FormControl>
@@ -108,9 +145,83 @@ export default function SignUpForm() {
               )}
             />
 
-            <Button type="submit" className="w-full">
-              Sign Up
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type={passwordVisible ? "text" : "password"}
+                        placeholder="********"
+                        {...field}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPasswordVisible((prev) => !prev)}
+                        className="absolute right-3 top-2.5 text-muted-foreground cursor-pointer"
+                      >
+                        {passwordVisible ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="passwordConfirm"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type={confirmVisible ? "text" : "password"}
+                        placeholder="********"
+                        {...field}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setConfirmVisible((prev) => !prev)}
+                        className="absolute right-3 top-2.5 text-muted-foreground cursor-pointer"
+                      >
+                        {confirmVisible ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              disabled={loading}
+              type="submit"
+              className="w-full relative"
+            >
+              Sign Up{" "}
+              {loading && <Loader2 className="absolute right-4 animate-spin" />}
             </Button>
+
+            <p className="text-center text-sm text-muted-foreground pt-2">
+              Already have an account?{" "}
+              <Link href="/sign-in" className="text-primary underline">
+                Sign in
+              </Link>
+            </p>
           </form>
         </Form>
       </CardContent>

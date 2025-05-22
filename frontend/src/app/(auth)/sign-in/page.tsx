@@ -1,11 +1,15 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { api } from "@/lib/axios";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormField,
@@ -13,69 +17,109 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form"
-import { toast } from "sonner"
-import { api } from "@/lib/axios"
+} from "@/components/ui/form";
+import { useState } from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 const FormSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(6, { message: "Password must be at least 6 chars" }),
-  })
-  
+  email: z.string().email(),
+  password: z.string().min(6),
+});
 
-export default function SignUpForm() {
+export default function SignInPage() {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-        email: "",
-        password: "",
-      },      
-  })
+      email: "",
+      password: "",
+    },
+  });
+  const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      const res = await api.post("/auth/login", data)
-      console.log({res, "RESPONSE DATA":res.data});
-      toast.success("Log In Successful!")
+      await api.post("/auth/login", data, { withCredentials: true });
+      toast.success("Logged in successfully");
+      router.push("/dashboard");
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Log In failed")
+      toast.error(err.response?.data?.message || "Login failed");
     }
   }
 
   return (
-    <Card className="max-w-md w-full mx-auto my-20">
+    <Card className="max-w-md w-full mx-auto mt-24 shadow-md border border-muted">
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
+        <CardTitle className="text-center text-2xl">Sign In</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {["email", "password"].map((field) => (
-              <FormField
-                key={field}
-                control={form.control}
-                name={field as keyof z.infer<typeof FormSchema>}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{field.name}</FormLabel>
-                    <FormControl>
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="you@example.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <div className="relative">
                       <Input
-                        type={field.name === "password" ? "password" : "text"}
-                        placeholder={field.name}
+                        type={passwordVisible ? "text" : "password"}
+                        placeholder="********"
                         {...field}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-            <Button type="submit" className="w-full">
-              Sign Up
+                      <button
+                        type="button"
+                        onClick={() => setPasswordVisible((prev) => !prev)}
+                        className="absolute right-3 top-2.5 text-muted-foreground cursor-pointer"
+                      >
+                        {passwordVisible ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button disabled={loading} type="submit" className="w-full">
+              Sign In{" "}
+              {loading && <Loader2 className="absolute right-4 animate-spin" />}
             </Button>
+
+            <p className="text-center text-sm text-muted-foreground pt-2">
+              Don’t have an account?{" "}
+              <Link href="/sign-up" className="text-primary underline">
+                Sign up
+              </Link>
+            </p>
           </form>
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }
