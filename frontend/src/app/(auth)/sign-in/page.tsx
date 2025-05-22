@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { setAuthCookie } from "@/lib/actions/auth/set-auth-cookie";
+import { setAuthCookie } from "@/lib/actions/auth/auth-cookies";
 import { useUserStore } from "@/lib/stores/user";
 import { useAuthUser } from "@/hook/useAuthUser";
 

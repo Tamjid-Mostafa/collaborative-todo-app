@@ -6,14 +6,14 @@ const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET!);
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("access_token")?.value;
-  console.log({ token: req.cookies });
+//   console.log({ token: req.cookies });
   if (!token) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
   try {
     const { payload } = await jwtVerify(token, secret);
-    console.log({ payload });
+    // console.log({ payload });
     const requestHeaders = new Headers(req.headers);
     requestHeaders.set("x-user-id", payload?.sub as string);
     requestHeaders.set("x-user-role", payload?.role as string);
@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
     });
     return response;
   } catch (error) {
-    console.log({ error });
+    // console.log({ error });
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 }

@@ -1,9 +1,8 @@
 import axios from "axios";
-import { cookies } from "next/headers";
+import { getAuthCookie } from "./actions/auth/auth-cookies";
 
 export async function createSSRApi() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
+  const token = await getAuthCookie();
 
   return axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
