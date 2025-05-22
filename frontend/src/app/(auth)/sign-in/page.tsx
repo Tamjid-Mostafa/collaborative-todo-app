@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/form";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useUser } from "@/lib/stores/user";
 
 const FormSchema = z.object({
   email: z.string().email(),
@@ -38,10 +39,14 @@ export default function SignInPage() {
   });
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const { setUser } = useUser();
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      await api.post("/auth/login", data, { withCredentials: true });
+      const res = await api.post("/auth/login", data, {
+        withCredentials: true,
+      });
+      setUser(res.data.user);
       toast.success("Logged in successfully");
       router.push("/todos");
     } catch (err: any) {

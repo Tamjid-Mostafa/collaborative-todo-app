@@ -1,39 +1,21 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { api } from "@/lib/axios"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { api } from "@/lib/axios";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { createSSRApi } from "@/lib/ssrApi";
 
 type TodoApp = {
-  _id: string
-  name: string
-  role: "owner" | "editor" | "viewer"
-}
+  _id: string;
+  name: string;
+  role: "owner" | "editor" | "viewer";
+};
 
-export default function TodoAppsPage() {
-  const [todos, setTodos] = useState<TodoApp[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function fetchTodos() {
-      try {
-        const res = await api.get("/todos", {withCredentials:true})
-        console.log(res);
-        setTodos(res.data)
-      } catch (err) {
-        console.error("Failed to load todos")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchTodos()
-  }, [])
+export default async function TodoAppsPage() {
+  const api = await createSSRApi();
+  const { data: todos } = await api.get("/todos");
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 space-y-6">
+    <div className="max-w-4xl mx-auto mt-10 space-y-6 px-5">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Your Todo Apps</h1>
         <Button asChild>
@@ -41,13 +23,11 @@ export default function TodoAppsPage() {
         </Button>
       </div>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : todos.length === 0 ? (
+      {todos?.length === 0 ? (
         <p className="text-muted-foreground">No todo apps yet.</p>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
-          {todos.map((todo) => (
+          {todos.map((todo: TodoApp) => (
             <Card key={todo._id}>
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
@@ -69,5 +49,5 @@ export default function TodoAppsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
