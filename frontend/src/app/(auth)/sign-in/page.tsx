@@ -20,7 +20,9 @@ import {
 } from "@/components/ui/form";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useUser } from "@/lib/stores/user";
+import { setAuthCookie } from "@/lib/actions/auth/set-auth-cookie";
+import { useUserStore } from "@/lib/stores/user";
+import { useAuthUser } from "@/hook/useAuthUser";
 
 const FormSchema = z.object({
   email: z.string().email(),
@@ -39,8 +41,7 @@ export default function SignInPage() {
   });
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const { setUser } = useUser();
-
+  const { setUser } = useAuthUser();
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       const res = await api.post("/auth/login", data, {
@@ -49,7 +50,10 @@ export default function SignInPage() {
       setUser(res.data.user);
       toast.success("Logged in successfully");
       console.log("/redirect");
-      router.push("/todos");
+      setAuthCookie(res.data.access_token);
+      setTimeout(() => {
+        router.push("/todos");
+      }, 2000);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Login failed");
     }
