@@ -5,7 +5,11 @@ import {
   IsNotEmpty,
   IsOptional,
   IsIn,
+  MinLength,
+  MaxLength,
+  Matches,
 } from 'class-validator';
+import { Match } from '../decorator/match.decorator';
 
 export class CreateUserDto {
   @IsDefined({ message: 'First name is required' })
@@ -29,8 +33,17 @@ export class CreateUserDto {
 
   @IsDefined({ message: 'Password is required' })
   @IsString()
-  @IsNotEmpty({ message: 'Password cannot be empty' })
+  @MinLength(8)
+  @MaxLength(64)
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/,
+    { message: "Password too weak" }
+  )
   password: string;
+  
+  
+  @Match("password", { message: "Passwords do not match" })
+  passwordConfirm: string;
 
   @IsOptional()
   @IsIn(['admin', 'viewer', 'editor'], {
