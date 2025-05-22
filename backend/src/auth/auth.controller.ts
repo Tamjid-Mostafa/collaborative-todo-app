@@ -17,16 +17,16 @@ export class AuthController {
     @Body() dto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { user, access_token } = await this.authService.signup(dto);
+    const response = await this.authService.signup(dto);
 
-    res.cookie('access_token', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
-      maxAge: 1000 * 60 * 60 * 24 * 7
-    });
+    // res.cookie('access_token', access_token, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: 'none',
+    //   maxAge: 1000 * 60 * 60 * 24 * 7
+    // });
 
-    return { message: 'User created successfully', user };
+    return response;
   }
 
   @Post('login')
@@ -34,19 +34,18 @@ export class AuthController {
     @Body() body: { email: string; password: string },
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { access_token, user } = await this.authService.login(
+    const response = await this.authService.login(
       body.email,
       body.password,
     );
 
-    res.cookie('access_token', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
-      maxAge: 1000 * 60 * 60 * 24 * 7
-    });
-    console.log(res);
-    return { message: 'Login successful', user };
+    // res.cookie('access_token', access_token, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: 'none',
+    //   maxAge: 1000 * 60 * 60 * 24 * 7
+    // });
+    return response;
   }
 
   @Post('logout')
