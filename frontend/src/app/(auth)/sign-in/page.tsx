@@ -3,7 +3,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { api } from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -21,8 +20,8 @@ import {
 import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { setAuthCookie } from "@/lib/actions/auth/auth-cookies";
-import { useUserStore } from "@/lib/stores/user";
-import { useAuthUser } from "@/hook/useAuthUser";
+import { useAuthStore } from "@/lib/stores/auth";
+import { useApi } from "@/lib/api-client";
 
 const FormSchema = z.object({
   email: z.string().email(),
@@ -41,18 +40,20 @@ export default function SignInPage() {
   });
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const { setUser } = useAuthUser();
+  const { setAuth } = useAuthStore();
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    setLoading(true)
+    setLoading(true);
     try {
+      const api = useApi();
       const res = await api.post("/auth/login", data, {
         withCredentials: true,
       });
-      await setAuthCookie(res.data.access_token);
-      setUser(res.data.user);
+      const { access_token, user } = res.data;
+      await setAuthCookie(access_token);
+      setAuth(access_token, user);
       toast.success("Logged in successfully");
       router.push("/todos");
-      setLoading(false)
+      setLoading(false);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Login failed");
     }
@@ -115,7 +116,11 @@ export default function SignInPage() {
               )}
             />
 
-            <Button disabled={loading} type="submit" className="w-full relative">
+            <Button
+              disabled={loading}
+              type="submit"
+              className="w-full relative"
+            >
               Sign In{" "}
               {loading && <Loader2 className="absolute right-4 animate-spin" />}
             </Button>

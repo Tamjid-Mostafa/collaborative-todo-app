@@ -1,8 +1,7 @@
-import { api } from "@/lib/axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { createSSRApi } from "@/lib/ssrApi";
+import { getServerApi } from "@/lib/api-server";
 
 type TodoApp = {
   _id: string;
@@ -11,8 +10,10 @@ type TodoApp = {
 };
 
 export default async function TodoAppsPage() {
-  const api = await createSSRApi();
-  const { data: todos } = await api.get("/todos");
+    const api = await getServerApi()
+    const res = await api.get('/todos')
+    const todos = res.data
+  
 
   return (
     <div className="max-w-4xl mx-auto mt-10 space-y-6 px-5">

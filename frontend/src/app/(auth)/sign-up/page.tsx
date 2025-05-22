@@ -16,10 +16,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { api } from "@/lib/axios";
 import { useState } from "react";
 import { Eye, EyeOff, Loader, Loader2 } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
+import { useApi } from "@/lib/api-client";
 
 const FormSchema = z
   .object({
@@ -61,6 +61,7 @@ export default function SignUpForm() {
     setLoading(true);
     try {
       const { passwordConfirm, ...userCredentials } = data;
+      const api = useApi();
       const res = await api.post("/auth/signup", userCredentials);
       toast.success("Account created");
       router.push("/todos");
