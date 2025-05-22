@@ -43,17 +43,16 @@ export default function SignInPage() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { setUser } = useAuthUser();
   async function onSubmit(data: z.infer<typeof FormSchema>) {
+    setLoading(true)
     try {
       const res = await api.post("/auth/login", data, {
         withCredentials: true,
       });
+      await setAuthCookie(res.data.access_token);
       setUser(res.data.user);
       toast.success("Logged in successfully");
-      console.log("/redirect");
-      setAuthCookie(res.data.access_token);
-      setTimeout(() => {
-        router.push("/todos");
-      }, 2000);
+      router.push("/todos");
+      setLoading(false)
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Login failed");
     }
@@ -116,7 +115,7 @@ export default function SignInPage() {
               )}
             />
 
-            <Button disabled={loading} type="submit" className="w-full">
+            <Button disabled={loading} type="submit" className="w-full relative">
               Sign In{" "}
               {loading && <Loader2 className="absolute right-4 animate-spin" />}
             </Button>
