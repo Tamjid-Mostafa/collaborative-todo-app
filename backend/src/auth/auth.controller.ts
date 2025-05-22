@@ -45,6 +45,7 @@ export class AuthController {
       sameSite: 'lax',
       maxAge: 1000 * 60 * 60 * 24 * 7
     });
+    console.log(res);
     return { message: 'Login successful', user };
   }
 

@@ -48,6 +48,7 @@ export default function SignInPage() {
       });
       setUser(res.data.user);
       toast.success("Logged in successfully");
+      console.log("/redirect");
       router.push("/todos");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Login failed");

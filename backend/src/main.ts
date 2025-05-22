@@ -15,7 +15,7 @@ async function bootstrap() {
   );
   app.use(cookieParser());
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000','https://collaborative-todo-app-frontend.vercel.app'],
     credentials: true,
   });
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
