@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/axios";
 import { useState } from "react";
 import { Eye, EyeOff, Loader, Loader2 } from "lucide-react";
+import { redirect, useRouter } from "next/navigation";
 
 const FormSchema = z
   .object({
@@ -55,13 +56,14 @@ export default function SignUpForm() {
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
-
+  const router = useRouter();
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setLoading(true);
     try {
       const { passwordConfirm, ...userCredentials } = data;
       const res = await api.post("/auth/signup", userCredentials);
       toast.success("Account created");
+      router.push("/todos");
       setLoading(false);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Signup failed", {

@@ -15,8 +15,8 @@ async function bootstrap() {
   );
   app.use(cookieParser());
   app.enableCors({
-    // origin: 'http://localhost:3000',
-    // credentials: true,
+    origin: 'http://localhost:3000',
+    credentials: true,
   });
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   await app.listen(process.env.PORT ?? 3000);

@@ -43,7 +43,7 @@ export default function SignInPage() {
     try {
       await api.post("/auth/login", data, { withCredentials: true });
       toast.success("Logged in successfully");
-      router.push("/dashboard");
+      router.push("/todos");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Login failed");
     }
