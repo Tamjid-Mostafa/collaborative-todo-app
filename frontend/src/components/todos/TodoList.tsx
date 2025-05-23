@@ -7,6 +7,8 @@ import { useState } from "react";
 import TodoCard from "./TodoCard";
 import Link from "next/link";
 import { toast } from "sonner";
+import {useMultipleSocketRooms } from "@/lib/useSocket";
+import { useAuthStore } from "@/lib/stores/auth";
 
 export interface TodoApp {
   _id: string;
@@ -25,7 +27,16 @@ export default function TodoList() {
       return res.data;
     },
   });
-
+  const {user} = useAuthStore()
+  useMultipleSocketRooms([user?._id!], {
+    collaboratorUpdate: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+    todoUpdate: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+    todoDeleted: () => console.log("Deleted Task"),
+  });
   const deleteTodoMutation = useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/todos/${id}`);

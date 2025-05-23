@@ -13,6 +13,7 @@ import { CreateTodoAppDto } from './dto/create-todo-app.dto';
 import { Task, TaskDocument } from '../task/schema/task.schema';
 import { TaskEntity } from '../task/task.entity';
 import { PopulatedTodoAppEntity } from './populated.entity';
+import { TodoGateway } from './todo.gateway';
 
 @Injectable()
 export class TodoAppService {
@@ -22,6 +23,7 @@ export class TodoAppService {
 
     @InjectModel(Task.name)
     private taskModel: Model<TaskDocument>,
+    private readonly todoGateway: TodoGateway,
   ) {}
   private resolveUserRole(
     todo: { owner: any; editors: any[]; viewers: any[] },
@@ -115,6 +117,10 @@ export class TodoAppService {
     }
 
     await todo.save();
+    this.todoGateway.emitCollaboratorUpdate(targetUserId, {
+      userId: targetId,
+      role,
+    });
   }
 
   async deleteIfOwner(todoId: string, userId: string): Promise<boolean> {
@@ -125,8 +131,15 @@ export class TodoAppService {
 
     const role = this.resolveUserRole(todo, userId);
     if (role !== 'owner') throw new ForbiddenException();
-
     await this.todoAppModel.findByIdAndDelete(todoId);
+
+    const allUserIds = [
+      ...todo.editors.map((id) => id.toString()),
+      ...todo.viewers.map((id) => id.toString()),
+    ];
+
+    this.todoGateway.emitTodoDeleted(allUserIds, todoId);
+
     return true;
   }
 }

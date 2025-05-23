@@ -6,6 +6,7 @@ import { TodoAppController } from './todo.controller';
 import { TodoApp, TodoAppSchema } from './schema/todo.schema';
 import { UserModule } from '../user/user.module';
 import { TaskModule } from '../task/task.module';
+import { TodoGateway } from './todo.gateway';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { TaskModule } from '../task/task.module';
     TaskModule
   ],
   controllers: [TodoAppController],
-  providers: [TodoAppService],
+  providers: [TodoAppService, TodoGateway],
   exports: [TodoAppService]
 })
 export class TodoAppModule {}

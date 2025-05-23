@@ -55,6 +55,7 @@ export function CollaboratorSection({
     onSuccess: () => {
       toast.success("User invited successfully");
       queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] });
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
       setSelectedUserId("");
     },
     onError: () => {

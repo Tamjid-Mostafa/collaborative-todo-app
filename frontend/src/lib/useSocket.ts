@@ -12,16 +12,33 @@ export const getSocket = (): Socket => {
   return socket;
 };
 
-export const useSocketRoom = (roomId: string, onUpdate: () => void) => {
+export const useMultipleSocketRooms = (
+  roomIds: string[],
+  eventHandlers: { [event: string]: (...args: any[]) => void }
+) => {
   useEffect(() => {
     const s = getSocket();
 
-    s.emit("joinRoom", roomId);
-    s.on("taskUpdate", onUpdate);
+    // Join all rooms
+    roomIds.forEach((roomId) => {
+      s.emit("joinRoom", roomId);
+    });
+
+    // Register all event handlers
+    Object.entries(eventHandlers).forEach(([event, handler]) => {
+      s.on(event, handler);
+    });
 
     return () => {
-      s.emit("leaveRoom", roomId);
-      s.off("taskUpdate", onUpdate);
+      // Leave all rooms
+      roomIds.forEach((roomId) => {
+        s.emit("leaveRoom", roomId);
+      });
+
+      // Remove all handlers
+      Object.entries(eventHandlers).forEach(([event, handler]) => {
+        s.off(event, handler);
+      });
     };
-  }, [roomId, onUpdate]);
+  }, [JSON.stringify(roomIds), ...Object.values(eventHandlers)]);
 };

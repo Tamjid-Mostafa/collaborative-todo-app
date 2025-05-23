@@ -35,7 +35,7 @@ export default function CreateToDoPage() {
       const api = useApi();
       const res = await api.post("/todos", data);
       toast.success("Todo App created");
-      router.push("/todos");
+      router.push("/todos/" + res.data._id);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to create");
     }

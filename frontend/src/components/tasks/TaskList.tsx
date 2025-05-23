@@ -15,7 +15,8 @@ import Link from "next/link";
 import { Badge } from "../ui/badge";
 import { CollaboratorSection } from "./CollaboratorSection";
 import { User } from "./types";
-import { useSocketRoom } from "@/lib/useSocket";
+import { useMultipleSocketRooms } from "@/lib/useSocket";
+import { useAuthStore } from "@/lib/stores/auth";
 
 export interface Task {
   _id: string;
@@ -33,12 +34,17 @@ export default function TaskList() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
-
-  useSocketRoom(todoId, () => {
-    queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] });
+  const { user } = useAuthStore();
+  useMultipleSocketRooms([todoId, user?._id!], {
+    taskUpdate: () =>
+      queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] }),
+    collaboratorUpdate: () =>
+      queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] }),
+    todoDeleted: () =>  {
+      toast.error("Todo was deleted.");
+      router.replace("/todos");
+    },
   });
-  
-
 
   const { data, isLoading } = useQuery<{
     tasks: Task[];
@@ -180,8 +186,23 @@ export default function TaskList() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-  console.log(data);
-  
+  // console.log(data);
+  const deleteTodoMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/todos/${id}`);
+    },
+    onSuccess: () => {
+      router.replace("/todos");
+      toast.success("Todo deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to delete todo. Please try again."
+      );
+    },
+  });
   return (
     <div className="max-w-3xl mx-auto mt-8 space-y-6">
       <div className="flex justify-between items-center">
@@ -202,10 +223,21 @@ export default function TaskList() {
             </Badge>
           </h1>
         </div>
-        <TaskModal onSubmit={handleCreate} disabled={!isEditorOrOwner} />
+        <div className="space-x-4">
+          {data?.role === "owner" && (
+            <Button
+              variant="destructive"
+              onClick={() => deleteTodoMutation.mutate(data.todoApp._id)}
+              className="cursor-pointer"
+            >
+              Delete
+            </Button>
+          )}
+          <TaskModal onSubmit={handleCreate} disabled={!isEditorOrOwner} />
+        </div>
       </div>
 
-      {(selected.length > 1 && isEditorOrOwner) && (
+      {selected.length > 1 && isEditorOrOwner && (
         <div className="flex gap-2 justify-end items-center flex-wrap">
           <StatusSelect
             value="in-progress"
@@ -254,7 +286,7 @@ export default function TaskList() {
       )}
       <CollaboratorSection
         todoId={todoId}
-        canInvite={isEditorOrOwner}
+        canInvite={data?.role === "owner"}
         owner={data?.todoApp.owner}
         editors={data?.todoApp.editors}
         viewers={data?.todoApp.viewers}
