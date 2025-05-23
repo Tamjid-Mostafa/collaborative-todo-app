@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getServerApi } from "@/lib/api-server";
+import TodoCard from "@/components/todos/TodoCard";
 
 type TodoApp = {
   _id: string;
@@ -10,10 +11,9 @@ type TodoApp = {
 };
 
 export default async function TodoAppsPage() {
-    const api = await getServerApi()
-    const res = await api.get('/todos')
-    const todos = res.data
-  
+  const api = await getServerApi();
+  const res = await api.get("/todos");
+  const todos = res.data;
 
   return (
     <div className="max-w-4xl mx-auto mt-10 space-y-6 px-5">
@@ -29,23 +29,7 @@ export default async function TodoAppsPage() {
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {todos.map((todo: TodoApp) => (
-            <Card key={todo._id}>
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  <span>{todo.name}</span>
-                  <span className="text-xs text-muted-foreground capitalize">
-                    {todo.role}
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Link href={`/todos/${todo._id}`}>
-                  <Button variant="outline" size="sm">
-                    Open
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <TodoCard todo={todo} key={todo._id} />
           ))}
         </div>
       )}

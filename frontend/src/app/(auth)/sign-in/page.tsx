@@ -55,6 +55,7 @@ export default function SignInPage() {
       router.push("/todos");
       setLoading(false);
     } catch (err: any) {
+      setLoading(false);
       toast.error(err.response?.data?.message || "Login failed");
     }
   }

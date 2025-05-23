@@ -67,13 +67,8 @@ export default function SignUpForm() {
       router.push("/todos");
       setLoading(false);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Signup failed", {
-        action: {
-          label: "reset",
-          onClick: () => setLoading(false),
-        },
-        onDismiss: () => setLoading(false),
-      });
+      setLoading(false);
+      toast.error(err.response?.data?.message || "Signup failed");
     }
   }
 
