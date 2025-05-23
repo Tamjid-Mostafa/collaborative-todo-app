@@ -58,11 +58,11 @@ export function TaskModal({ onSubmit }: Props) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New Task</DialogTitle>
+          <DialogTitle>Create Task</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[calc(100vh-200px)]">
-          <div className="space-y-4">
+        <ScrollArea className="max-h-[calc(100vh-200px)] max-w-xl x-2">
+          <div className="space-y-4 p-4">
             <Input
               placeholder="Title"
               value={title}
@@ -84,9 +84,11 @@ export function TaskModal({ onSubmit }: Props) {
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
+                  {["Low","Medium","High"].map((item, i)=>{
+                    return(
+                      <SelectItem value={item.toLowerCase()} key={i} className="cursor-pointer">{item}</SelectItem>
+                    )
+                  })}
                 </SelectContent>
               </Select>
             </div>

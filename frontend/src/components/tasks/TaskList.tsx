@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { StatusSelect } from "./StatusSelect";
+import { PrioritySelect } from "./PrioritySelect";
 
-interface Task {
+export interface Task {
   _id: string;
   title: string;
   description?: string;
@@ -72,6 +74,38 @@ export default function TaskList() {
       toast.success("Task marked completed");
     },
   });
+  const markStatusMutation = useMutation({
+    mutationFn: async ({
+      id,
+      status,
+    }: {
+      id: string;
+      status: "in-progress" | "completed" | "stale";
+    }) => {
+      await api.patch(`/todos/${todoId}/tasks/${id}`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", todoId] });
+      toast.success("Status updated");
+    },
+  });
+  const markPriorityMutation = useMutation({
+    mutationFn: async ({
+      id,
+      priority,
+    }: {
+      id: string;
+      priority: Task["priority"];
+    }) => {
+      await api.patch(`/todos/${todoId}/tasks/${id}`, { priority });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", todoId] });
+      {
+        selected.length < 2 && toast.success("Priority updated");
+      }
+    },
+  });
 
   const handleCreate = async (task: {
     title: string;
@@ -87,11 +121,42 @@ export default function TaskList() {
     setSelected([]);
   };
 
-  const handleMarkCompleted = async () => {
-    await Promise.all(
-      selected.map((id) => markCompletedMutation.mutateAsync(id))
-    );
-    setSelected([]);
+  type MarkType = "status" | "priority";
+
+  const handleMark = async (
+    type: MarkType,
+    value: Task["status"] | Task["priority"]
+  ) => {
+    switch (type) {
+      case "status":
+        await Promise.all(
+          selected.map((id) =>
+            markStatusMutation.mutateAsync({
+              id,
+              status: value as Task["status"],
+            })
+          )
+        );
+        toast.success("Status updated for selected tasks");
+        break;
+
+      case "priority":
+        await Promise.all(
+          selected.map((id) =>
+            markPriorityMutation.mutateAsync({
+              id,
+              priority: value as Task["priority"],
+            })
+          )
+        );
+        toast.success("Priority updated for selected tasks");
+        break;
+
+      default:
+        break;
+    }
+
+    // setSelected([]);
   };
 
   const toggleSelect = (id: string) => {
@@ -108,10 +173,16 @@ export default function TaskList() {
       </div>
 
       {selected.length > 1 && (
-        <div className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={handleMarkCompleted}>
-            Mark Completed
-          </Button>
+        <div className="flex gap-2 justify-end items-center flex-wrap">
+          <StatusSelect
+            value="in-progress"
+            onChange={(status) => handleMark("status", status)}
+          />
+          <PrioritySelect
+            value="medium"
+            onChange={(priority) => handleMark("priority", priority)}
+          />
+
           <Button variant="destructive" onClick={handleDeleteSelected}>
             Delete Selected
           </Button>
@@ -128,9 +199,22 @@ export default function TaskList() {
               task={task}
               selected={selected.includes(task._id)}
               onToggle={() => toggleSelect(task._id)}
-              showControls={selected.includes(task._id) && selected.length === 1}
+              showControls={
+                selected.includes(task._id) && selected.length === 1
+              }
               onDelete={() => deleteTaskMutation.mutateAsync(task._id)}
-              onMarkComplete={() => markCompletedMutation.mutateAsync(task._id)}
+              onPriorityChange={(priority) =>
+                markPriorityMutation.mutateAsync({
+                  id: task._id,
+                  priority: priority,
+                })
+              }
+              onStatusChange={(status) =>
+                markStatusMutation.mutateAsync({
+                  id: task._id,
+                  status: status,
+                })
+              }
             />
           ))}
         </div>

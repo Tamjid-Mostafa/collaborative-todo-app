@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/home/header";
 import ReactQueryProvider from "./providers";
+import Footer from "@/components/home/footer";
 
 export const metadata: Metadata = {
   title: "Collaborative ToDo App",
@@ -21,6 +22,7 @@ export default function RootLayout({
           <main className="container mx-auto md:px-10 px-5">
             <Header />
             {children}
+            <Footer/>
           </main>
           <Toaster />
         </ReactQueryProvider>

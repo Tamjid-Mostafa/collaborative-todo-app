@@ -1,0 +1,28 @@
+"use client";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+
+type Props = {
+  value: "low" | "medium" | "high";
+  onChange: (value: "low" | "medium" | "high") => void;
+};
+
+export function PrioritySelect({ value, onChange }: Props) {
+  return (
+    <Select value={value} onValueChange={(v) => onChange(v as any)}>
+      <SelectTrigger className="w-32">
+        <SelectValue placeholder="Priority" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="low">Low</SelectItem>
+        <SelectItem value="medium">Medium</SelectItem>
+        <SelectItem value="high">High</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+}
