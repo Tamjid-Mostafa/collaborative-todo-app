@@ -16,15 +16,11 @@ import { TodoAppService } from './todo.service';
 
 import { TodoAppEntity } from './todo.entity';
 import { CreateTodoAppDto } from './dto/create-todo-app.dto';
-import { UserService } from 'src/user/user.service';
-import { Types } from 'mongoose';
-import { UserEntity } from 'src/user/user.entity';
 
 @Controller('todos')
 @UseGuards(JwtAuthGuard)
 export class TodoAppController {
   constructor(
-    private readonly userService: UserService,
     private readonly todoAppService: TodoAppService,
   ) {}
 

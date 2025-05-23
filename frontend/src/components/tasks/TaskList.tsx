@@ -51,7 +51,7 @@ export default function TaskList() {
     },
     enabled: !!todoId,
   });
-
+  const isEditorOrOwner = ["owner", "editor"].includes(data?.role ?? "");
   const createTaskMutation = useMutation({
     mutationFn: async (task: {
       title: string;
@@ -65,7 +65,7 @@ export default function TaskList() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", todoId] });
+      queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] });
       toast.success("Task created");
     },
   });
@@ -75,20 +75,13 @@ export default function TaskList() {
       await api.delete(`/todos/${todoId}/tasks/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", todoId] });
-      toast.success("Task deleted");
+      queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] });
+      {
+        selected.length < 2 && toast.success("Task deleted");
+      }
     },
   });
 
-  const markCompletedMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await api.patch(`/todos/${todoId}/tasks/${id}`, { status: "completed" });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", todoId] });
-      toast.success("Task marked completed");
-    },
-  });
   const markStatusMutation = useMutation({
     mutationFn: async ({
       id,
@@ -100,7 +93,7 @@ export default function TaskList() {
       await api.patch(`/todos/${todoId}/tasks/${id}`, { status });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", todoId] });
+      queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] });
       toast.success("Status updated");
     },
   });
@@ -115,7 +108,7 @@ export default function TaskList() {
       await api.patch(`/todos/${todoId}/tasks/${id}`, { priority });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", todoId] });
+      queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] });
       {
         selected.length < 2 && toast.success("Priority updated");
       }
@@ -133,6 +126,7 @@ export default function TaskList() {
 
   const handleDeleteSelected = async () => {
     await Promise.all(selected.map((id) => deleteTaskMutation.mutateAsync(id)));
+    toast.success("Selected tasks deleted");
     setSelected([]);
   };
 
@@ -179,7 +173,7 @@ export default function TaskList() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-console.log(data);
+  console.log(data);
   return (
     <div className="max-w-3xl mx-auto mt-8 space-y-6">
       <div className="flex justify-between items-center">
@@ -200,10 +194,10 @@ console.log(data);
             </Badge>
           </h1>
         </div>
-        <TaskModal onSubmit={handleCreate} />
+        {isEditorOrOwner && <TaskModal onSubmit={handleCreate} />}
       </div>
 
-      {selected.length > 1 && (
+      {selected.length > 1 && isEditorOrOwner && (
         <div className="flex gap-2 justify-end items-center flex-wrap">
           <StatusSelect
             value="in-progress"
@@ -229,10 +223,8 @@ console.log(data);
               key={task._id}
               task={task}
               selected={selected.includes(task._id)}
-              onToggle={() => toggleSelect(task._id)}
-              showControls={
-                selected.includes(task._id) && selected.length === 1
-              }
+              onToggle={isEditorOrOwner ? () => toggleSelect(task._id) : undefined}
+              showControls={isEditorOrOwner && selected.includes(task._id) && selected.length === 1}
               onDelete={() => deleteTaskMutation.mutateAsync(task._id)}
               onPriorityChange={(priority) =>
                 markPriorityMutation.mutateAsync({ id: task._id, priority })
@@ -248,7 +240,7 @@ console.log(data);
       )}
       <CollaboratorSection
         todoId={todoId}
-        canInvite={data?.role === "owner"}
+        canInvite={isEditorOrOwner}
         owner={data?.todoApp.owner}
         editors={data?.todoApp.editors}
         viewers={data?.todoApp.viewers}

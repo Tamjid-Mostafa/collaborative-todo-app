@@ -29,11 +29,6 @@ export class TaskController {
     return this.taskService.create(appId, req.user.userId, dto);
   }
 
-  @Get()
-  findAll(@Param('todoAppId') appId: string): Promise<TaskEntity[]> {
-    return this.taskService.findAll(appId);
-  }
-
   @Patch(':taskId')
   update(@Param('taskId') id: string, @Body() dto: UpdateTaskDto): Promise<TaskEntity>  {
     return this.taskService.update(id, dto);

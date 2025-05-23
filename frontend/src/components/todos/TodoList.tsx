@@ -41,7 +41,7 @@ export default function TodoList() {
       );
     },
   });
-console.log(todos);
+
   return (
     <div className="max-w-4xl mx-auto mt-10 space-y-6 px-5">
       <div className="flex justify-between items-center">
