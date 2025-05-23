@@ -1,7 +1,7 @@
 "use client";
 
 import { useApi } from "@/lib/api-client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { TaskModal } from "@/components/tasks/TaskModal";
 import { TaskCard } from "@/components/tasks/TaskCard";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { StatusSelect } from "./StatusSelect";
 import { PrioritySelect } from "./PrioritySelect";
+import { ArrowLeftCircle, MoveLeft } from "lucide-react";
+import Link from "next/link";
 
 export interface Task {
   _id: string;
@@ -25,7 +27,7 @@ export default function TaskList() {
   const todoId = params?.id as string;
   const api = useApi();
   const queryClient = useQueryClient();
-
+  const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
 
   const { data: tasks = [], isLoading } = useQuery<Task[]>({
@@ -168,7 +170,12 @@ export default function TaskList() {
   return (
     <div className="max-w-3xl mx-auto mt-8 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Tasks</h1>
+        <div className="flex items-center gap-2">
+          <button onClick={() => router.back()} className="inline cursor-pointer group">
+            <ArrowLeftCircle className="w-6 h-6 group-hover:scale-105 scale-100 transition duration-300" />
+          </button>
+          <h1 className="text-2xl font-bold inline">Tasks</h1>
+        </div>
         <TaskModal onSubmit={handleCreate} />
       </div>
 

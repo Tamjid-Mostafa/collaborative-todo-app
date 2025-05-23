@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { TodoApp, TodoAppDocument } from './schema/todo.schema';
@@ -38,4 +38,20 @@ export class TodoAppService {
     const plain = todoDocs.map((doc) => doc.toObject());
     return plainToInstance(TodoAppEntity, plain);
   }
+
+
+  async deleteIfOwner(todoId: string, userId: string): Promise<boolean> {
+    const todo = await this.todoAppModel.findById(todoId);
+    if (!todo) {
+      throw new NotFoundException("Todo not found");
+    }
+
+    if (todo.owner.toString() !== userId.toString()) {
+      return false;
+    }
+  
+    await this.todoAppModel.findByIdAndDelete(todoId);
+    return true;
+  }
+  
 }
