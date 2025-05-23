@@ -13,7 +13,7 @@ import { Label } from "../ui/label";
 type Props = {
   task: Task;
   selected: boolean;
-  onToggle: () => void;
+  onToggle?: () => void;
   showControls?: boolean;
   onDelete?: () => void;
   onStatusChange?: (status: Task["status"]) => void;
