@@ -1,4 +1,6 @@
-import { IsString, IsOptional, IsIn } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import { TaskStatus } from '../status.enum';
+import { TaskPriority } from '../priority.enum';
 
 export class CreateTaskDto {
   @IsString()
@@ -8,8 +10,15 @@ export class CreateTaskDto {
   @IsString()
   description?: string;
 
+  @IsOptional()
+  @IsEnum(TaskStatus)
+  status?: TaskStatus;
 
   @IsOptional()
-  @IsIn(['in-progress', 'completed', 'stale'])
-  status?: string; 
+  @IsEnum(TaskPriority)
+  priority?: TaskPriority;
+
+  @IsOptional()
+  @IsDateString()
+  dueDate?: Date;
 }

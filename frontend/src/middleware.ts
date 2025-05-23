@@ -5,40 +5,46 @@ import { jwtVerify } from "jose";
 const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET!);
 
 export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
   const token = req.cookies.get("access_token")?.value;
 
-  // If token exists and user is on sign-in or sign-up page, redirect to ToDo page
-  if (token && ["/sign-in", "/sign-up"].includes(req.nextUrl.pathname)) {
+  if (token && ["/sign-in", "/sign-up"].includes(pathname)) {
     try {
       const { payload } = await jwtVerify(token, secret);
       if (payload?.sub) {
         return NextResponse.redirect(new URL("/todos", req.url));
       }
-    } catch (err) {
-      // Invalid token, let them access sign-in
+    } catch {
     }
   }
+  if (pathname.startsWith("/todos")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/sign-in", req.url));
+    }
 
-  if (!token && req.nextUrl.pathname.startsWith("/todos")) {
-    return NextResponse.redirect(new URL("/sign-in", req.url));
+    try {
+      const { payload } = await jwtVerify(token, secret);
+
+      const requestHeaders = new Headers(req.headers);
+      requestHeaders.set("x-user-id", payload?.sub as string);
+      if (payload?.role) {
+        requestHeaders.set("x-user-role", payload?.role as string);
+      }
+
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    } catch {
+      const res = NextResponse.redirect(new URL("/sign-in", req.url));
+      res.cookies.delete("access_token");
+      return res;
+    }
   }
-
-  try {
-    const { payload } = await jwtVerify(token!, secret);
-    const requestHeaders = new Headers(req.headers);
-    requestHeaders.set("x-user-id", payload?.sub as string);
-    requestHeaders.set("x-user-role", payload?.role as string);
-
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
-  } catch {
-    return NextResponse.redirect(new URL("/sign-in", req.url));
-  }
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/todos/:path*", "/dashboard/:path*", "/sign-in", "/sign-up"],
+  matcher: ["/todos/:path*", "/sign-in", "/sign-up"],
 };

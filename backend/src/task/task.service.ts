@@ -24,9 +24,10 @@ export class TaskService {
   }
 
   async findAll(todoAppId: string): Promise<TaskEntity[]> {
-    console.log({todoAppId});
-    const tasks = await this.taskModel.find({ todoApp: todoAppId });
-    console.log({tasks});
+    const tasks = await this.taskModel.find({
+      todoApp: new Types.ObjectId(todoAppId),
+    });
+  
     return tasks.map(
       (task) =>
         new TaskEntity(task.toObject() as unknown as Partial<TaskEntity>),

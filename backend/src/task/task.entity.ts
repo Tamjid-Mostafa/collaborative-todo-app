@@ -1,5 +1,5 @@
 import { Exclude, Expose, Transform } from 'class-transformer';
-import { Types } from 'mongoose';
+import { TaskPriority } from './priority.enum';
 
 export class TaskEntity {
   @Transform(({ value }) => value.toString())
@@ -13,6 +13,9 @@ export class TaskEntity {
 
   @Expose()
   dueDate?: Date;
+
+  @Expose()
+  priority?: TaskPriority;
 
   @Transform(({ value }) => value?.toString())
   @Expose()

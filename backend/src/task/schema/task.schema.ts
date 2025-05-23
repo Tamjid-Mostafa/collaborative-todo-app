@@ -12,7 +12,13 @@ export class Task {
   description?: string;
 
   @Prop({ enum: ['in-progress', 'completed', 'stale'], default: 'in-progress' })
-  status: string;
+  status: 'in-progress' | 'completed' | 'stale';
+
+  @Prop({ enum: ['low', 'medium', 'high'], default: 'medium' })
+  priority: 'low' | 'medium' | 'high';
+
+  @Prop({ type: Date })
+  dueDate?: Date;
 
   @Prop({ type: Types.ObjectId, ref: 'TodoApp', required: true })
   todoApp: Types.ObjectId;
