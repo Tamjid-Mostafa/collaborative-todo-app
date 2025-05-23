@@ -205,7 +205,7 @@ export default function TaskList() {
         <TaskModal onSubmit={handleCreate} disabled={!isEditorOrOwner} />
       </div>
 
-      {selected.length > 1 && isEditorOrOwner && (
+      {(selected.length > 1 && isEditorOrOwner) && (
         <div className="flex gap-2 justify-end items-center flex-wrap">
           <StatusSelect
             value="in-progress"
