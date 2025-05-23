@@ -57,7 +57,7 @@ export default function TaskListPage() {
         <h1 className="text-2xl font-bold">Tasks</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>Create Task</Button>
+            <Button className="cursor-pointer">Create Task</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -69,7 +69,9 @@ export default function TaskListPage() {
               onChange={(e) => setTitle(e.target.value)}
             />
             <DialogFooter>
-              <Button onClick={handleCreateTask}>Save</Button>
+              <Button onClick={handleCreateTask} className="cursor-pointer">
+                Save
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

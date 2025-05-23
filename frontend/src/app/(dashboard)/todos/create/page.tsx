@@ -62,7 +62,7 @@ export default function CreateToDoPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full cursor-pointer">
               Create
             </Button>
           </form>

@@ -1,5 +1,11 @@
 // components/TodoCard.tsx
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import clsx from "clsx";
@@ -27,15 +33,18 @@ export default function TodoCard({ todo, className, footer }: TodoCardProps) {
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-end">
+      <CardContent>
+
+      </CardContent>
+      <CardFooter className="flex justify-end">
         {footer || (
           <Link href={`/todos/${todo._id}`}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="cursor-pointer">
               Open
             </Button>
           </Link>
         )}
-      </CardContent>
+      </CardFooter>
     </Card>
   );
 }
