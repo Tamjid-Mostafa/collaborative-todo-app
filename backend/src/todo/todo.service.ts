@@ -64,7 +64,6 @@ export class TodoAppService {
 
     if (!todo) throw new NotFoundException();
     const role = this.getUserRole(todo, userId);
-    console.log(role);
     if (role === 'none') throw new ForbiddenException();
 
     const tasks = await this.taskModel.find({
