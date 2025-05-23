@@ -12,6 +12,9 @@ import { StatusSelect } from "./StatusSelect";
 import { PrioritySelect } from "./PrioritySelect";
 import { ArrowLeftCircle, MoveLeft } from "lucide-react";
 import Link from "next/link";
+import { Badge } from "../ui/badge";
+import { CollaboratorSection } from "./CollaboratorSection";
+import { User } from "./types";
 
 export interface Task {
   _id: string;
@@ -30,10 +33,20 @@ export default function TaskList() {
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
 
-  const { data: tasks = [], isLoading } = useQuery<Task[]>({
-    queryKey: ["tasks", todoId],
+  const { data, isLoading } = useQuery<{
+    tasks: Task[];
+    todoApp: {
+      _id: string;
+      name: string;
+      owner: User;
+      editors: User[];
+      viewers: User[];
+    };
+    role: "owner" | "editor" | "viewer";
+  }>({
+    queryKey: ["todo-details", todoId],
     queryFn: async () => {
-      const res = await api.get(`/todos/${todoId}/tasks`);
+      const res = await api.get(`/todos/${todoId}/details`);
       return res.data;
     },
     enabled: !!todoId,
@@ -166,15 +179,26 @@ export default function TaskList() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-
+console.log(data);
   return (
     <div className="max-w-3xl mx-auto mt-8 space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <button onClick={() => router.back()} className="inline cursor-pointer group">
+          <button
+            onClick={() => router.back()}
+            className="inline cursor-pointer group"
+          >
             <ArrowLeftCircle className="w-6 h-6 group-hover:scale-105 scale-100 transition duration-300" />
           </button>
-          <h1 className="text-2xl font-bold inline">Tasks</h1>
+          <h1 className="text-2xl font-bold">
+            {data?.todoApp?.name || "Todo App"}{" "}
+            <Badge
+              variant="secondary"
+              className="capitalize text-muted-foreground"
+            >
+              {data?.role}
+            </Badge>
+          </h1>
         </div>
         <TaskModal onSubmit={handleCreate} />
       </div>
@@ -198,9 +222,9 @@ export default function TaskList() {
 
       {isLoading ? (
         <p className="text-muted-foreground text-sm">Loading tasks...</p>
-      ) : tasks.length > 0 ? (
+      ) : data?.tasks && data?.tasks?.length > 0 ? (
         <div className="space-y-3">
-          {tasks.map((task) => (
+          {data.tasks.map((task) => (
             <TaskCard
               key={task._id}
               task={task}
@@ -211,16 +235,10 @@ export default function TaskList() {
               }
               onDelete={() => deleteTaskMutation.mutateAsync(task._id)}
               onPriorityChange={(priority) =>
-                markPriorityMutation.mutateAsync({
-                  id: task._id,
-                  priority: priority,
-                })
+                markPriorityMutation.mutateAsync({ id: task._id, priority })
               }
               onStatusChange={(status) =>
-                markStatusMutation.mutateAsync({
-                  id: task._id,
-                  status: status,
-                })
+                markStatusMutation.mutateAsync({ id: task._id, status })
               }
             />
           ))}
@@ -228,13 +246,13 @@ export default function TaskList() {
       ) : (
         <p className="text-muted-foreground text-sm">No Tasks Available</p>
       )}
-
-      <div className="mt-10 border-t pt-6">
-        <h2 className="text-lg font-semibold mb-2">Collaborators</h2>
-        <p className="text-sm text-muted-foreground">
-          (Assign editors/viewers – coming soon)
-        </p>
-      </div>
+      <CollaboratorSection
+        todoId={todoId}
+        canInvite={data?.role === "owner"}
+        owner={data?.todoApp.owner}
+        editors={data?.todoApp.editors}
+        viewers={data?.todoApp.viewers}
+      />
     </div>
   );
 }

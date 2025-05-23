@@ -5,6 +5,7 @@ import { Model, Types } from 'mongoose';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskEntity } from './task.entity';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class TaskService {
@@ -27,11 +28,9 @@ export class TaskService {
     const tasks = await this.taskModel.find({
       todoApp: new Types.ObjectId(todoAppId),
     });
-  
-    return tasks.map(
-      (task) =>
-        new TaskEntity(task.toObject() as unknown as Partial<TaskEntity>),
-    );
+
+    const plain = tasks.map((task) => task.toObject());
+    return plainToInstance(TaskEntity, plain);
   }
 
   async update(taskId: string, dto: UpdateTaskDto): Promise<TaskEntity> {

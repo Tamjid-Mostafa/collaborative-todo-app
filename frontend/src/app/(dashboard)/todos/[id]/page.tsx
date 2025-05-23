@@ -17,9 +17,9 @@ export default async function Page({
 
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
-    queryKey: ["tasks", id],
+    queryKey: ["todo-details", id],
     queryFn: async () => {
-      const res = await api.get(`/todos/${id}/tasks`);
+      const res = await api.get(`/todos/${id}/details`);
       return res.data;
     },
   });

@@ -10,6 +10,6 @@ import { Task, TaskSchema } from './schema/task.schema';
   ],
   controllers: [TaskController],
   providers: [TaskService],
-  exports: [TaskService]
+  exports: [TaskService, MongooseModule],
 })
 export class TaskModule {}
