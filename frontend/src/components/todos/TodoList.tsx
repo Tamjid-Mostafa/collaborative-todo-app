@@ -6,6 +6,7 @@ import { useApi } from "@/lib/api-client";
 import { useState } from "react";
 import TodoCard from "./TodoCard";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export interface TodoApp {
   _id: string;
@@ -30,10 +31,17 @@ export default function TodoList() {
       await api.delete(`/todos/${id}`);
     },
     onSuccess: () => {
+      toast.success("Todo deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["todos"] });
     },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to delete todo. Please try again."
+      );
+    },
   });
-
+console.log(todos);
   return (
     <div className="max-w-4xl mx-auto mt-10 space-y-6 px-5">
       <div className="flex justify-between items-center">
@@ -64,14 +72,15 @@ export default function TodoList() {
                       Open
                     </Button>
                   </Link>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => deleteTodoMutation.mutate(todo._id)}
-                    className="cursor-pointer"
-                  >
-                    Delete
-                  </Button>
+                  {todo.role === "owner" && (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => deleteTodoMutation.mutate(todo._id)}
+                    >
+                      Delete
+                    </Button>
+                  )}
                 </div>
               }
             />

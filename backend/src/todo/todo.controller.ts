@@ -65,35 +65,12 @@ export class TodoAppController {
     @Body() dto: { userId: string; role: 'editor' | 'viewer' },
     @Req() req: any,
   ) {
-    const todo = await this.todoAppService.findTodoById(todoId);
-    if (!todo) throw new NotFoundException('Todo not found');
-  
-    if (todo.owner.toString() !== req.user.userId) {
-      throw new ForbiddenException('Only the owner can invite users');
-    }
-  
-    const userIdObj = new Types.ObjectId(dto.userId);
-  
-    const editors = todo.editors.map(id => id.toString());
-    const viewers = todo.viewers.map(id => id.toString());
-    const userIdStr = userIdObj.toString();
-  
-    if (dto.role === 'editor') {
-      todo.viewers = todo.viewers.filter(id => id.toString() !== userIdStr);
-      if (!editors.includes(userIdStr)) {
-        todo.editors.push(userIdObj);
-      }
-    }
-  
-    if (dto.role === 'viewer') {
-      todo.editors = todo.editors.filter(id => id.toString() !== userIdStr);
-      if (!viewers.includes(userIdStr)) {
-        todo.viewers.push(userIdObj);
-      }
-    }
-  
-    await todo.save();
+    await this.todoAppService.addCollaborator(
+      todoId,
+      req.user.userId,
+      dto.userId,
+      dto.role,
+    );
     return { message: 'User invited' };
   }
-  
 }

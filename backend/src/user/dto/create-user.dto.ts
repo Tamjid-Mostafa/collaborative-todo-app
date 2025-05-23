@@ -31,10 +31,4 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty({ message: 'Password cannot be empty' })
   password: string;
-
-  @IsOptional()
-  @IsIn(['admin', 'viewer', 'editor'], {
-    message: 'Role must be one of: admin, viewer, editor',
-  })
-  role?: string;
 }
