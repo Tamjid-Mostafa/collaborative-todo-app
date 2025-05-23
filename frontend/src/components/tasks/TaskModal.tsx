@@ -31,9 +31,10 @@ type Props = {
     priority: "low" | "medium" | "high";
     dueDate?: Date;
   }) => Promise<void>;
+  disabled?: boolean;
 };
 
-export function TaskModal({ onSubmit }: Props) {
+export function TaskModal({ onSubmit, disabled }: Props) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
@@ -53,7 +54,7 @@ export function TaskModal({ onSubmit }: Props) {
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild disabled={disabled}>
         <Button className="cursor-pointer">Create Task</Button>
       </DialogTrigger>
       <DialogContent>
@@ -84,10 +85,16 @@ export function TaskModal({ onSubmit }: Props) {
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
-                  {["Low","Medium","High"].map((item, i)=>{
-                    return(
-                      <SelectItem value={item.toLowerCase()} key={i} className="cursor-pointer">{item}</SelectItem>
-                    )
+                  {["Low", "Medium", "High"].map((item, i) => {
+                    return (
+                      <SelectItem
+                        value={item.toLowerCase()}
+                        key={i}
+                        className="cursor-pointer"
+                      >
+                        {item}
+                      </SelectItem>
+                    );
                   })}
                 </SelectContent>
               </Select>
@@ -110,8 +117,7 @@ export function TaskModal({ onSubmit }: Props) {
             disabled={loading}
             className="relative cursor-pointer"
           >
-            Save{" "}
-            {loading && <Loader2 className=" animate-spin" />}
+            Save {loading && <Loader2 className=" animate-spin" />}
           </Button>
         </DialogFooter>
       </DialogContent>

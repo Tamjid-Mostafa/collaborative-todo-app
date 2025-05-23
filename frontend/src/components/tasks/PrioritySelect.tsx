@@ -10,11 +10,12 @@ import {
 type Props = {
   value: "low" | "medium" | "high";
   onChange: (value: "low" | "medium" | "high") => void;
+  disabled?: boolean
 };
 
-export function PrioritySelect({ value, onChange }: Props) {
+export function PrioritySelect({ value, onChange, disabled }: Props) {
   return (
-    <Select value={value} onValueChange={(v) => onChange(v as any)}>
+    <Select disabled={disabled} value={value} onValueChange={(v) => onChange(v as any)}>
       <SelectTrigger className="w-32">
         <SelectValue placeholder="Priority" />
       </SelectTrigger>

@@ -45,14 +45,12 @@ export function TaskCard({
   return (
     <div className="border p-4 rounded flex justify-between items-start gap-4">
       <div className="flex items-start gap-3 w-full">
-        {onToggle && (
-          <Checkbox
-            checked={selected}
-            onCheckedChange={onToggle}
-            className="mt-1"
-          />
-        )}
-
+        <Checkbox
+          checked={selected}
+          onCheckedChange={onToggle}
+          className="mt-1"
+          disabled={onToggle === undefined}
+        />
         <div className="flex-1 space-y-1">
           <p className="font-medium text-base">{task.title}</p>
 
@@ -67,51 +65,53 @@ export function TaskCard({
           )}
         </div>
 
-        {!showControls && (
-          <div className="flex gap-2 mt-2">
-            <Badge
-              className={cn(
-                "capitalize",
-                task.status === "completed" && "bg-green-100 text-green-700",
-                task.status === "in-progress" &&
-                  "bg-yellow-100 text-yellow-800",
-                task.status === "stale" && "bg-red-100 text-red-700"
-              )}
-            >
-              {task.status}
-            </Badge>
-            <Badge
-              variant="outline"
-              className={cn(getPriorityColor(task.priority))}
-            >
-              {task.priority}
-            </Badge>
-          </div>
-        )}
-        {showControls && (
-          <div className="flex flex-col gap-3 items-start max-w-[190px]">
-            <div className="flex justify-between gap-2 w-full">
-              <Label>Status:</Label>
-              <StatusSelect value={task.status} onChange={onStatusChange!} />
-            </div>
-            <div className="flex justify-between gap-2 w-full">
-              <Label>Priority:</Label>
-              <PrioritySelect
-                value={task.priority ?? "medium"}
-                onChange={onPriorityChange!}
-              />{" "}
-            </div>
+        <div className="flex gap-2 mt-2">
+          <Badge
+            className={cn(
+              "capitalize",
+              task.status === "completed" && "bg-green-100 text-green-700",
+              task.status === "in-progress" && "bg-yellow-100 text-yellow-800",
+              task.status === "stale" && "bg-red-100 text-red-700"
+            )}
+          >
+            {task.status}
+          </Badge>
+          <Badge
+            variant="outline"
+            className={cn(getPriorityColor(task.priority))}
+          >
+            {task.priority}
+          </Badge>
+        </div>
 
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={onDelete}
-              className="w-full cursor-pointer"
-            >
-              🗑️ Delete
-            </Button>
+        <div className="flex flex-col gap-3 items-start max-w-[190px]">
+          <div className="flex justify-between gap-2 w-full">
+            <Label>Status:</Label>
+            <StatusSelect
+              value={task.status}
+              onChange={onStatusChange!}
+              disabled={!showControls}
+            />
           </div>
-        )}
+          <div className="flex justify-between gap-2 w-full">
+            <Label>Priority:</Label>
+            <PrioritySelect
+              value={task.priority ?? "medium"}
+              onChange={onPriorityChange!}
+              disabled={!showControls}
+            />{" "}
+          </div>
+
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={onDelete}
+            disabled={!showControls}
+            className="w-full cursor-pointer"
+          >
+            🗑️ Delete
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -10,11 +10,16 @@ import {
 type Props = {
   value: "in-progress" | "completed" | "stale";
   onChange: (value: "in-progress" | "completed" | "stale") => void;
+  disabled?: boolean;
 };
 
-export function StatusSelect({ value, onChange }: Props) {
+export function StatusSelect({ value, onChange, disabled }: Props) {
   return (
-    <Select value={value} onValueChange={(v) => onChange(v as any)}>
+    <Select
+      disabled={disabled}
+      value={value}
+      onValueChange={(v) => onChange(v as any)}
+    >
       <SelectTrigger className="w-32">
         <SelectValue placeholder="Status" />
       </SelectTrigger>

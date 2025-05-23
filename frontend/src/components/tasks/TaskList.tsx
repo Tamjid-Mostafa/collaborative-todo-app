@@ -194,7 +194,7 @@ export default function TaskList() {
             </Badge>
           </h1>
         </div>
-        {isEditorOrOwner && <TaskModal onSubmit={handleCreate} />}
+        <TaskModal onSubmit={handleCreate} disabled={!isEditorOrOwner} />
       </div>
 
       {selected.length > 1 && isEditorOrOwner && (
@@ -223,8 +223,14 @@ export default function TaskList() {
               key={task._id}
               task={task}
               selected={selected.includes(task._id)}
-              onToggle={isEditorOrOwner ? () => toggleSelect(task._id) : undefined}
-              showControls={isEditorOrOwner && selected.includes(task._id) && selected.length === 1}
+              onToggle={
+                isEditorOrOwner ? () => toggleSelect(task._id) : undefined
+              }
+              showControls={
+                isEditorOrOwner &&
+                selected.includes(task._id) &&
+                selected.length === 1
+              }
               onDelete={() => deleteTaskMutation.mutateAsync(task._id)}
               onPriorityChange={(priority) =>
                 markPriorityMutation.mutateAsync({ id: task._id, priority })
