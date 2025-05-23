@@ -7,7 +7,7 @@ import { TaskCard } from "@/components/tasks/TaskCard";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StatusSelect } from "./StatusSelect";
 import { PrioritySelect } from "./PrioritySelect";
 import { ArrowLeftCircle, MoveLeft } from "lucide-react";
@@ -15,6 +15,7 @@ import Link from "next/link";
 import { Badge } from "../ui/badge";
 import { CollaboratorSection } from "./CollaboratorSection";
 import { User } from "./types";
+import { useSocketRoom } from "@/lib/useSocket";
 
 export interface Task {
   _id: string;
@@ -32,6 +33,12 @@ export default function TaskList() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [selected, setSelected] = useState<string[]>([]);
+
+  useSocketRoom(todoId, () => {
+    queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] });
+  });
+  
+
 
   const { data, isLoading } = useQuery<{
     tasks: Task[];
@@ -174,6 +181,7 @@ export default function TaskList() {
     );
   };
   console.log(data);
+  
   return (
     <div className="max-w-3xl mx-auto mt-8 space-y-6">
       <div className="flex justify-between items-center">

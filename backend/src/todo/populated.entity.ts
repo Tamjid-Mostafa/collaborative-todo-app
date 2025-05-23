@@ -1,5 +1,5 @@
 import { Expose, Transform, Type } from 'class-transformer';
-import { UserEntity } from 'src/user/user.entity';
+import { UserEntity } from '../user/user.entity';
 
 export class PopulatedTodoAppEntity {
   @Expose()
