@@ -17,9 +17,9 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full max-w-5xl mx-auto flex justify-between items-center py-4">
+    <header className="w-full flex justify-between items-center py-4">
       <h1 className="text-3xl font-bold">Collaborative ToDo</h1>
-      <div className="space-x-4">
+      <div className="flex gap-2 whitespace-nowrap items-center">
         <Link href="/todos" className=" hover:text-primary">
           My ToDos
         </Link>

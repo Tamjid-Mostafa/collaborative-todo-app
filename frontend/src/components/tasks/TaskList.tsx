@@ -10,7 +10,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { StatusSelect } from "./StatusSelect";
 import { PrioritySelect } from "./PrioritySelect";
-import { ArrowLeftCircle, MoveLeft } from "lucide-react";
+import { ArrowLeftCircle, MoveLeft, Trash } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
 import { CollaboratorSection } from "./CollaboratorSection";
@@ -40,7 +40,7 @@ export default function TaskList() {
       queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] }),
     collaboratorUpdate: () =>
       queryClient.invalidateQueries({ queryKey: ["todo-details", todoId] }),
-    todoDeleted: () =>  {
+    todoDeleted: () => {
       toast.error("Todo was deleted.");
       router.replace("/todos");
     },
@@ -186,7 +186,7 @@ export default function TaskList() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-  // console.log(data);
+  // 0(data);
   const deleteTodoMutation = useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/todos/${id}`);
@@ -205,7 +205,7 @@ export default function TaskList() {
   });
   return (
     <div className="max-w-3xl mx-auto mt-8 space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between md:items-center items-start">
         <div className="flex items-center gap-2">
           <button
             onClick={() => router.back()}
@@ -223,14 +223,16 @@ export default function TaskList() {
             </Badge>
           </h1>
         </div>
-        <div className="space-x-4">
+        <div className="space-x-2 flex items-center">
           {data?.role === "owner" && (
             <Button
               variant="destructive"
+              size="icon"
               onClick={() => deleteTodoMutation.mutate(data.todoApp._id)}
-              className="cursor-pointer"
+              className="cursor-pointer w-9 h-9"
             >
-              Delete
+              <Trash />
+              <span className="sr-only">Delete</span>
             </Button>
           )}
           <TaskModal onSubmit={handleCreate} disabled={!isEditorOrOwner} />

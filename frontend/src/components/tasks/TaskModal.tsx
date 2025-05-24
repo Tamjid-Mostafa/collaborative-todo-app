@@ -55,7 +55,7 @@ export function TaskModal({ onSubmit, disabled }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild disabled={disabled}>
-        <Button className="cursor-pointer">Create Task</Button>
+        <Button className="cursor-pointer" size="default">Create</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
