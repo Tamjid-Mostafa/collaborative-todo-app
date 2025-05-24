@@ -39,7 +39,7 @@ export class TodoAppController {
 
   @Get()
   async findAllForUser(@Req() req: any): Promise<TodoAppEntity[]> {
-    console.log('User', req.user);
+    // console.log('User', req.user);
     return this.todoAppService.findAllForUser(req.user.userId);
   }
 

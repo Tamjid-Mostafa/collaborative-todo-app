@@ -34,8 +34,7 @@ export default function TodoList() {
     },
     todoUpdate: () => {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
-    },
-    todoDeleted: () => console.log("Deleted Task"),
+    }
   });
   const deleteTodoMutation = useMutation({
     mutationFn: async (id: string) => {
